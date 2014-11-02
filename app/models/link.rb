@@ -1,5 +1,6 @@
 class Link < ActiveRecord::Base
   belongs_to :user
+  has_many :visits
   validates :slug, :presence => true
   validates :slug, :uniqueness => true
   validates :target_url, :presence => true
@@ -7,6 +8,10 @@ class Link < ActiveRecord::Base
 def strip_http!
   target_url.gsub!("http://", "")
   target_url.gsub!("https://", "")
+  
+end
+def visit_count
+  visits.count
   
 end
 

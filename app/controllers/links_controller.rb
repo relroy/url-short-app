@@ -1,4 +1,6 @@
 class LinksController < ApplicationController
+ before_action :authenticate_user!
+
  def index
   @links = current_user.links
  end
@@ -17,13 +19,38 @@ class LinksController < ApplicationController
 
   end
  end
-   def redirect
-    @link = Link.find_by(:slug => params[:slug])
-  if @link
-    redirect_to "http://#{@link.target_url}"
-  else
-    raise ActionController::RoutingError.new('Not Found')
-  end
+   def show
+
+     @link = Link.find_by(:id => params[:id], :user_id => current_user.id)
+
+     if @link.nil?
+      flash[:warning] = "Link not found."
+      redirect_to links_path
+     end
+   end
+   def edit
+    @link = Link.find_by(:id => params[:id]), :user_id => current_user.id)
+    if @link.nil?
+      flash[:warning] = "Link not found."
+      redirect_to links_path
+     end
      
+   end
+   def update
+    @link = Link.find_by(:id => params[:id]), :user_id => current_user.id)
+      if @link.update(params[:link])
+      @link.strip_http!
+     flash[:success] = "Link Updated"
+     redirect_to link_path(@link.id)
+      else
+        render 'edit'
+      end
+   end
+   def destroy
+     @link = Link.find_by(:id => params[:id]), :user_id => current_user.id)
+     @link.destroy
+     flash[:success] = 'Link deleted.'
+     redirect_to links_path
+
    end
 end
